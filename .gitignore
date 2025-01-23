@@ -5,6 +5,9 @@ __pycache__/
 
 # C extensions
 *.so
+src/utils/__pycache__/
+*.pyc
+src/utils/__pycache__/*.pyc
 
 
 *.pdf

@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+from src.utils.constants import save_quest_path
 from src.utils.helpers import execute_query, extract_questions, merge_questions
 
 app = Flask(__name__)
@@ -9,37 +10,45 @@ CORS(app)
 
 @app.route('/query-questions/<level>', methods=['POST'])
 def query_questions(level):
-    data = request.get_json()
+    """
+    Endpoint to fetch and update question data based on the given level.
+    """
+    try:
+        data = request.get_json() or {}
+        questions_data = data.get('questions', {})
+        open_ended = questions_data.get('open_ended', [])
+        multiple_choice = questions_data.get('multiple_choice', [])
 
-    if not data or 'query' not in data:
-        return jsonify({"success": False, "error": "Missing 'query' in request body."}), 400
+        predefined_query = "SELECT * FROM questions WHERE difficulty_level = %s"
+        query_result = execute_query(predefined_query, (level,))
 
-    query = data['query']
-    result = execute_query(query, level)
+        if not query_result["success"]:
+            return jsonify({"error": query_result["error"]}), 500
 
-    if result['success']:
-        questions = extract_questions(result['data'])
-        return jsonify({"db_questions": questions}), 200
-    else:
-        return jsonify({"success": False, "error": result['error']}), 400
+        if open_ended and "data" in query_result:
+            open_ended.extend(extract_questions(query_result["data"]))
+
+        return jsonify(data), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/merge-question', methods=['POST'])
-def merge_questions():
-    data = request.get_json()
+@app.route('/save-payload', methods=['POST'])
+def save_payload():
+    """
+    Endpoint to save the received payload to a file.
+    """
+    try:
+        data = request.get_json() or {}
+        with open(save_quest_path, 'w') as f:
+            import json
+            json.dump(data, f, indent=4)
 
-    if not data or 'gen_quest' not in data or 'db_quest' not in data:
-        return jsonify({"success": False, "error": "Missing 'gen_quest' or 'db_quest' in request body."}), 400
+        return jsonify({"message": "Payload saved successfully.", "file_path": save_quest_path}), 200
 
-    gen_quest = data['gen_quest']
-    db_quest = data['db_quest']
-
-    if 'questions' in gen_quest and 'open_ended' in gen_quest['questions']:
-        gen_quest['questions']['open_ended'].extend(db_quest)
-    else:
-        return jsonify({"success": False, "error": "'gen_quest' does not have the correct structure."}), 400
-
-    return jsonify({"success": True, "merged_questions": gen_quest}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

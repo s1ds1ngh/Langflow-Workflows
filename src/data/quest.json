@@ -1,0 +1,52 @@
+{
+    "questions": {
+        "multiple_choice": [
+            {
+                "options": [
+                    "Platyhelminthes",
+                    "Echinodermata",
+                    "Annelida",
+                    "Arthropoda"
+                ],
+                "question": "Which of the following phyla exhibits radial symmetry in its adult form?"
+            },
+            {
+                "options": [
+                    "Locomotion",
+                    "Respiration",
+                    "Structural support",
+                    "Excretion"
+                ],
+                "question": "What is the primary function of the notochord in chordates?"
+            },
+            {
+                "options": [
+                    "Mollusca",
+                    "Arthropoda",
+                    "Annelida",
+                    "Echinodermata"
+                ],
+                "question": "Which phylum is characterized by the presence of jointed appendages and an exoskeleton made of chitin?"
+            },
+            {
+                "options": [
+                    "Coelom",
+                    "Pseudocoelom",
+                    "Acoelom",
+                    "No body cavity"
+                ],
+                "question": "What type of body cavity is found in aschelminthes?"
+            }
+        ],
+        "open_ended": [
+            "Explain the significance of the water vascular system in echinoderms, providing specific examples of how it is used.",
+            "Compare and contrast the circulatory systems of annelids and arthropods. How do these differences relate to their respective lifestyles?",
+            "Describe the key characteristics of the phylum Chordata, explaining how these features distinguish chordates from other animal phyla.",
+            "Explain the concept of diploblastic and triploblastic organization with examples.",
+            "How do sponges obtain their food and oxygen? Mention the structures involved.",
+            "Differentiate between an open and closed circulatory system with examples of organisms.",
+            "Describe the process of alternation of generations observed in cnidarians.",
+            "What features make Arthropoda the largest phylum in the animal kingdom?"
+        ]
+    }
+}

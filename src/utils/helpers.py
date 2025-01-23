@@ -1,9 +1,13 @@
 import psycopg2
-from psycopg2 import Error
 from src.utils.config.settings import settings
+from psycopg2.extras import RealDictCursor
 
 
-def execute_query(query, level=None):
+def execute_query(query, params=None):
+    """
+    Execute a database query with optional parameters.
+    Returns a dictionary containing the success status and data or error message.
+    """
     try:
         # Establish database connection
         connection = psycopg2.connect(
@@ -12,38 +16,30 @@ def execute_query(query, level=None):
             password=settings.DB_PASSWORD,  # Replace with your database password
             database=settings.QUESTIONS_DB  # Replace with your database name
         )
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-        if connection:
-            cursor = connection.cursor()
+        # Execute the query with parameters
+        cursor.execute(query, params)
 
-            # Modify the query to include a WHERE clause based on the level
-            if level:
-                query += " WHERE difficulty_level = %s"
-                cursor.execute(query, (level,))
-            else:
-                cursor.execute(query)
+        # Fetch all results
+        result = cursor.fetchall()
 
-            # Fetch all results
-            result = cursor.fetchall()
+        return {
+            "success": True,
+            "data": result
+        }
 
-            # Convert the result into a dictionary format
-            columns = [desc[0] for desc in cursor.description]  # Fetch column names
-            result_dict = [dict(zip(columns, row)) for row in result]
-
-            return {
-                "success": True,
-                "data": result_dict
-            }
-
-    except Error as e:
+    except psycopg2.Error as e:
         return {
             "success": False,
             "error": str(e)
         }
 
     finally:
-        if 'connection' in locals() and connection:
+        # Ensure resources are closed properly
+        if 'cursor' in locals():
             cursor.close()
+        if 'connection' in locals():
             connection.close()
 
 
